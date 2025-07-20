@@ -5,16 +5,16 @@ import models.TrafficLight;
 
 import static java.lang.Thread.sleep;
 
-public class RedState implements SignalState {
+public class GreenState implements SignalState {
     @Override
     public void handle(TrafficLight trafficLight) throws InterruptedException {
-        trafficLight.changeSignal(SignalType.RED);
-        System.out.println("Current Signal : RED");
+        trafficLight.changeSignal(SignalType.GREEN);
+        System.out.println("Current Signal : GREEN");
         sleep(trafficLight.getRedDuration());
     }
 
     @Override
     public SignalState nextState() {
-        return new GreenState();
+        return new YellowState();
     }
 }

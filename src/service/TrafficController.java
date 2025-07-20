@@ -1,47 +1,60 @@
-package models;
+package service;
+
+import models.SignalType;
+import models.TrafficLight;
+import models.state.RedState;
+import models.state.SignalState;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class TrafficController {
 
-    public static volatile TrafficController trafficController;
+    private final TrafficLight trafficLight;
+    private final ScheduledExecutorService scheduler;
+    private SignalState currentState;
 
     private TrafficController(TrafficLight trafficLight) {
         this.trafficLight = trafficLight;
+        this.scheduler = Executors.newSingleThreadScheduledExecutor();
+        this.currentState = new RedState();
     }
 
-    public static class TrafficControllerHolder {
-        private static final TrafficController INSTANCE = new TrafficController()
+    private static class TrafficControllerHandler {
+        private static TrafficController INSTANCE;
+
+        private static void initialize(TrafficLight trafficLight) {
+            if (INSTANCE == null) {
+                INSTANCE = new TrafficController(trafficLight);
+            }
+        }
     }
 
     public static TrafficController getInstance(TrafficLight trafficLight) {
-        return trafficController;
+        TrafficControllerHandler.initialize(trafficLight);
+        return TrafficControllerHandler.INSTANCE;
     }
 
-    private final TrafficLight trafficLight;
-
-
     public void startTrafficControlSystem() {
-        new Thread(() -> {
-            while(true) {
+        scheduler.execute(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.sleep(trafficLight.getRedDuration());
-                    trafficLight.changeSignal(SignalType.GREEN);
-                    Thread.sleep(trafficLight.getGreenDuration());
-                    trafficLight.changeSignal(SignalType.YELLOW);
-                    Thread.sleep(trafficLight.getYellowDuration());
-                    trafficLight.changeSignal(SignalType.RED);
+                    currentState.handle(trafficLight);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("Exception happened : " + e);
                 }
+                currentState = currentState.nextState();
             }
-        }).start();
+        });
     }
 
     public void handleEmergency() {
+        System.out.println("Emergency Mode Activated: Switching to GREEN");
         trafficLight.changeSignal(SignalType.GREEN);
         try {
             Thread.sleep(trafficLight.getGreenDuration());
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            System.out.println("Exception happened : " + e);
         }
     }
 }

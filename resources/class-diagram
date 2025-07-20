@@ -1,0 +1,48 @@
++---------------------+                +----------------------+
+|     <<Main>>        |                |  <<Singleton>>       |
+|      Main           |                |  TrafficController   |
++---------------------+                +----------------------+
+| - main()            | 1          1   | - trafficLight: TL   |
+|                     |--------------->| - scheduler: ScheduledExecutorService |
+|                     |                | - currentState: SignalState |
+|                     |                | + getInstance(TrafficLight)  |
+|                     |                | + startTrafficControlSystem()|
+|                     |                | + handleEmergency()          |
++---------------------+                +----------------------+
+                                                |
+                                                | 1
+                                                v
+                                      +----------------------+
+                                      |   TrafficLight       |
+                                      +----------------------+
+                                      | - id: int            |
+                                      | - currentSignal: Enum|
+                                      | - greenDuration: int |
+                                      | - redDuration: int   |
+                                      | - yellowDuration: int|
+                                      +----------------------+
+                                      | + changeSignal()     |
+                                      | + getters            |
+                                      +----------------------+
+
+                             +--------------------------+
+                             |     SignalState (interface) |
+                             +--------------------------+
+                             | + handle(TrafficLight)   |
+                             | + nextState() : SignalState |
+                             +--------------------------+
+                                    /       |       \
+                      +--------------+       |        +--------------+
+                      |                      |                       |
+                +----------+           +----------+             +-----------+
+                | RedState |           | GreenState|            | YellowState|
+                +----------+           +----------+             +-----------+
+                | handle() |           | handle()  |            | handle()   |
+                | nextState()           | nextState()           | nextState()|
+                +----------+           +----------+             +-----------+
+
++------------------------+
+|      SignalType enum    |
++------------------------+
+| RED, GREEN, YELLOW      |
++------------------------+

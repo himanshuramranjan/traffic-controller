@@ -1,0 +1,27 @@
+Main
+ |
+ |  TrafficController.getInstance(trafficLight)
+ |  trafficController.startTrafficControlSystem()
+ |  trafficController.handleEmergency()
+ v
+TrafficController
+ |
+ |  startTrafficControlSystem() starts scheduler thread
+ |  In scheduler thread:
+ |    loop:
+ |      currentState.handle(trafficLight)
+ |      currentState = currentState.nextState()
+ |
+ |  handleEmergency():
+ |    change signal to GREEN
+ |    sleep greenDuration
+ v
+SignalState (RedState, GreenState, YellowState)
+ |
+ |  handle(): change signal + sleep duration
+ |  nextState(): return next state
+ v
+TrafficLight
+ |
+ |  stores current signal and durations
+ |  changeSignal() updates currentSignal

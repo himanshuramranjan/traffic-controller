@@ -3,22 +3,20 @@ package models;
 public class TrafficController {
 
     public static volatile TrafficController trafficController;
-    private final TrafficLight trafficLight;
 
     private TrafficController(TrafficLight trafficLight) {
         this.trafficLight = trafficLight;
     }
 
+    public static class TrafficControllerHolder {
+        private static final TrafficController INSTANCE = new TrafficController()
+    }
+
     public static TrafficController getInstance(TrafficLight trafficLight) {
-        if(trafficController == null) {
-            synchronized (TrafficController.class) {
-                if(trafficController == null) {
-                    trafficController = new TrafficController(trafficLight);
-                }
-            }
-        }
         return trafficController;
     }
+
+    private final TrafficLight trafficLight;
 
 
     public void startTrafficControlSystem() {
